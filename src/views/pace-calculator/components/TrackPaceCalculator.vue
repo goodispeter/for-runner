@@ -28,10 +28,13 @@
                 <n-input-number
                   v-model:value="lapTimeSeconds"
                   :min="1"
-                  placeholder="輸入單圈秒數"
                   size="large"
                   class="input-number-field"
                   :show-button="false"
+                  clearable
+                  select-on-focus
+                  placeholder=""
+                  @focus="handleFocus"
                 />
                 <n-input-group-label class="input-label">秒</n-input-group-label>
               </n-input-group>
@@ -42,19 +45,26 @@
                 <n-input-number
                   v-model:value="paceMinutes"
                   :min="1"
-                  placeholder="分"
                   size="large"
                   class="input-number-field"
                   :show-button="false"
+                  clearable
+                  select-on-focus
+                  placeholder=""
+                  @focus="handleFocus"
                 />
                 <n-input-group-label class="input-label">分</n-input-group-label>
                 <n-input-number
                   v-model:value="paceSeconds"
                   :min="0"
-                  placeholder="秒"
+                  :max="59"
                   size="large"
                   class="input-number-field"
                   :show-button="false"
+                  clearable
+                  select-on-focus
+                  placeholder=""
+                  @focus="handleFocus"
                 />
                 <n-input-group-label class="input-label">秒</n-input-group-label>
               </n-input-group>
@@ -219,6 +229,17 @@ watch(calculationMode, (newMode) => {
     resultLapTime.value = calculateLapTimeFromPace(selectedLane.value, pace)
   }
 })
+
+// 處理輸入框焦點事件，確保選取全部文字
+const handleFocus = (event: FocusEvent) => {
+  const target = event.target as HTMLInputElement
+  if (target) {
+    // 使用 setTimeout 確保在 focus 事件完成後執行選取
+    setTimeout(() => {
+      target.select()
+    }, 0)
+  }
+}
 </script>
 
 <style scoped>
