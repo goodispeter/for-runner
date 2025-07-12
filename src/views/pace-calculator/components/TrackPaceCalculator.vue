@@ -173,25 +173,51 @@ const showResult = computed(() => {
 })
 
 // 監聽單圈時間變化並計算配速
-watch([lapTimeSeconds, selectedLane], () => {
-  if (calculationMode.value === 'lapTimeToPace' && lapTimeSeconds.value > 0 && selectedLane.value) {
-    resultPace.value = calculatePaceFromLapTime(selectedLane.value, lapTimeSeconds.value)
-  }
-})
+watch(
+  [lapTimeSeconds, selectedLane],
+  () => {
+    if (
+      calculationMode.value === 'lapTimeToPace' &&
+      lapTimeSeconds.value > 0 &&
+      selectedLane.value
+    ) {
+      resultPace.value = calculatePaceFromLapTime(selectedLane.value, lapTimeSeconds.value)
+    } else {
+      resultPace.value = { minutes: 0, seconds: 0 }
+    }
+  },
+  { immediate: true },
+)
 
 // 監聽配速變化並計算單圈時間
-watch([paceMinutes, paceSeconds, selectedLane], () => {
-  if (calculationMode.value === 'paceToLapTime' && paceMinutes.value > 0 && selectedLane.value) {
+watch(
+  [paceMinutes, paceSeconds, selectedLane],
+  () => {
+    if (calculationMode.value === 'paceToLapTime' && paceMinutes.value > 0 && selectedLane.value) {
+      const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
+      resultLapTime.value = calculateLapTimeFromPace(selectedLane.value, pace)
+    } else {
+      resultLapTime.value = 0
+    }
+  },
+  { immediate: true },
+)
+
+// 切換計算模式時重置值並重新計算
+watch(calculationMode, (newMode) => {
+  if (newMode === 'lapTimeToPace') {
+    lapTimeSeconds.value = 90
+    // 立即計算初始值
+    if (lapTimeSeconds.value > 0 && selectedLane.value) {
+      resultPace.value = calculatePaceFromLapTime(selectedLane.value, lapTimeSeconds.value)
+    }
+  } else {
+    paceMinutes.value = 5
+    paceSeconds.value = 0
+    // 立即計算初始值
     const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
     resultLapTime.value = calculateLapTimeFromPace(selectedLane.value, pace)
   }
-})
-
-// 切換計算模式時重置值
-watch(calculationMode, () => {
-  lapTimeSeconds.value = 90
-  paceMinutes.value = 5
-  paceSeconds.value = 0
 })
 </script>
 

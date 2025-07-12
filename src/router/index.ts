@@ -1,13 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/for-runner',
-  },
-  {
-    path: '/for-runner',
     name: 'Home',
     component: () => import('../views/home/HomePageView.vue'),
     meta: {
@@ -15,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/for-runner/pace-calculator',
+    path: '/pace-calculator',
     name: 'PaceCalculator',
     component: () => import('../views/pace-calculator/PaceCalculatorView.vue'),
     meta: {
@@ -40,12 +36,12 @@ const routes: RouteRecordRaw[] = [
   // 捕獲所有未匹配的路由，重定向到首頁
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/for-runner',
+    redirect: '/',
   },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory('/for-runner/'),
   routes,
 })
 

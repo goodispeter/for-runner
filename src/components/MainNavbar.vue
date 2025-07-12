@@ -42,7 +42,7 @@ const mainNavOptions = [
     label: '配速計算',
     key: 'pace-calculator',
     icon: Timer,
-    route: '/for-runner/pace-calculator',
+    route: '/pace-calculator',
   },
   // 未來功能擴充預留
   // {
@@ -80,7 +80,7 @@ const handleMainNavSelect = (key: string) => {
 
 // 處理標題點擊，回到首頁
 const handleTitleClick = () => {
-  router.push('/for-runner')
+  router.push('/')
 }
 </script>
 

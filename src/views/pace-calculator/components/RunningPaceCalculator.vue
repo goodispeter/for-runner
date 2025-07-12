@@ -205,35 +205,59 @@ const resultTimeFormatted = computed(() => {
 })
 
 // 監聽完賽時間變化並計算配速
-watch([targetHours, targetMinutes, targetSeconds, selectedDistance], () => {
-  if (calculationMode.value === 'timeToPace') {
+watch(
+  [targetHours, targetMinutes, targetSeconds, selectedDistance],
+  () => {
+    if (calculationMode.value === 'timeToPace') {
+      const totalSeconds = targetHours.value * 3600 + targetMinutes.value * 60 + targetSeconds.value
+      if (totalSeconds > 0 && selectedDistance.value > 0) {
+        resultPace.value = calculatePaceFromTime(selectedDistance.value, totalSeconds)
+      } else {
+        resultPace.value = { minutes: 0, seconds: 0 }
+      }
+    }
+  },
+  { immediate: true },
+)
+
+// 監聽配速變化並計算完賽時間
+watch(
+  [paceMinutes, paceSeconds, selectedDistance],
+  () => {
+    if (
+      calculationMode.value === 'paceToTime' &&
+      paceMinutes.value > 0 &&
+      selectedDistance.value > 0
+    ) {
+      const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
+      const totalSeconds = calculateTimeFromPace(selectedDistance.value, pace)
+      resultTime.value = formatTime(totalSeconds)
+    } else {
+      resultTime.value = { hours: 0, minutes: 0, seconds: 0 }
+    }
+  },
+  { immediate: true },
+)
+
+// 切換計算模式時重置值並重新計算
+watch(calculationMode, (newMode) => {
+  if (newMode === 'timeToPace') {
+    targetHours.value = 0
+    targetMinutes.value = 25
+    targetSeconds.value = 0
+    // 立即計算初始值
     const totalSeconds = targetHours.value * 3600 + targetMinutes.value * 60 + targetSeconds.value
     if (totalSeconds > 0 && selectedDistance.value > 0) {
       resultPace.value = calculatePaceFromTime(selectedDistance.value, totalSeconds)
     }
-  }
-})
-
-// 監聽配速變化並計算完賽時間
-watch([paceMinutes, paceSeconds, selectedDistance], () => {
-  if (
-    calculationMode.value === 'paceToTime' &&
-    paceMinutes.value > 0 &&
-    selectedDistance.value > 0
-  ) {
+  } else {
+    paceMinutes.value = 5
+    paceSeconds.value = 0
+    // 立即計算初始值
     const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
     const totalSeconds = calculateTimeFromPace(selectedDistance.value, pace)
     resultTime.value = formatTime(totalSeconds)
   }
-})
-
-// 切換計算模式時重置值
-watch(calculationMode, () => {
-  targetHours.value = 0
-  targetMinutes.value = 25
-  targetSeconds.value = 0
-  paceMinutes.value = 5
-  paceSeconds.value = 0
 })
 </script>
 

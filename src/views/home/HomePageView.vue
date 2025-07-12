@@ -69,7 +69,7 @@ import {
 const router = useRouter()
 
 const goToPaceCalculator = () => {
-  router.push('/for-runner/pace-calculator')
+  router.push('/pace-calculator')
 }
 </script>
 
