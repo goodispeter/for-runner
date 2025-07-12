@@ -306,17 +306,17 @@ watch(calculationMode, (newMode) => {
 /* 輸入欄位統一樣式 */
 .input-number-field {
   flex: 1;
-  min-width: 70px;
+  min-width: 50px;
   max-width: none;
 }
 
 :deep(.input-label) {
-  min-width: 32px;
+  min-width: 28px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   color: #8892b0;
   background: rgba(100, 255, 218, 0.1);
@@ -328,17 +328,20 @@ watch(calculationMode, (newMode) => {
   display: flex;
   align-items: stretch;
   width: 100%;
+  gap: 1px;
 }
 
 :deep(.n-input-number) {
   height: 40px;
   flex: 1;
+  min-width: 0;
 }
 
 :deep(.n-input-number .n-input__input-el) {
   height: 40px;
   line-height: 40px;
   text-align: center;
+  padding: 0 4px;
 }
 
 @media (max-width: 768px) {
@@ -369,18 +372,18 @@ watch(calculationMode, (newMode) => {
   }
 
   :deep(.input-label) {
-    min-width: 28px;
-    font-size: 12px;
+    min-width: 22px;
+    font-size: 10px;
   }
 
   .input-number-field {
-    min-width: 60px;
+    min-width: 45px;
     flex: 1;
   }
 
   :deep(.n-input-number .n-input__input-el) {
     font-size: 14px;
-    padding: 0 8px;
+    padding: 0 4px;
   }
 }
 
@@ -399,22 +402,22 @@ watch(calculationMode, (newMode) => {
   }
 
   :deep(.input-label) {
-    min-width: 24px;
-    font-size: 11px;
-    padding: 0 4px;
+    min-width: 20px;
+    font-size: 9px;
+    padding: 0 2px;
   }
 
   .input-number-field {
-    min-width: 55px;
+    min-width: 40px;
   }
 
   :deep(.n-input-number .n-input__input-el) {
-    font-size: 13px;
-    padding: 0 6px;
+    font-size: 12px;
+    padding: 0 2px;
   }
 
   :deep(.n-input-group) {
-    gap: 2px;
+    gap: 1px;
   }
 }
 </style>
