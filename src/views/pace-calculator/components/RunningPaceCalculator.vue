@@ -24,76 +24,23 @@
             </n-form-item>
 
             <n-form-item v-if="calculationMode === 'timeToPace'" label="目標完賽時間">
-              <n-input-group>
-                <n-input-number
-                  v-model:value="targetHours"
-                  :min="0"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">時</n-input-group-label>
-                <n-input-number
-                  v-model:value="targetMinutes"
-                  :min="0"
-                  :max="59"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">分</n-input-group-label>
-                <n-input-number
-                  v-model:value="targetSeconds"
-                  :min="0"
-                  :max="59"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">秒</n-input-group-label>
-              </n-input-group>
+              <TimeInputGroup
+                :hours="targetHours"
+                :minutes="targetMinutes"
+                :seconds="targetSeconds"
+                @update:hours="(val: number) => (targetHours = val)"
+                @update:minutes="(val: number) => (targetMinutes = val)"
+                @update:seconds="(val: number) => (targetSeconds = val)"
+              />
             </n-form-item>
 
             <n-form-item v-if="calculationMode === 'paceToTime'" label="每公里配速">
-              <n-input-group>
-                <n-input-number
-                  v-model:value="paceMinutes"
-                  :min="1"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">分</n-input-group-label>
-                <n-input-number
-                  v-model:value="paceSeconds"
-                  :min="0"
-                  :max="59"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">秒</n-input-group-label>
-              </n-input-group>
+              <PaceInputGroup
+                :minutes="paceMinutes"
+                :seconds="paceSeconds"
+                @update:minutes="(val: number) => (paceMinutes = val)"
+                @update:seconds="(val: number) => (paceSeconds = val)"
+              />
             </n-form-item>
           </n-form>
         </n-card>
@@ -107,23 +54,19 @@
           </template>
 
           <n-space vertical size="large">
-            <div v-if="calculationMode === 'timeToPace'" class="result-item">
-              <n-text class="result-label">配速</n-text>
-              <n-text class="result-value primary">
-                {{ resultPace.minutes }}:{{ resultPace.seconds.toString().padStart(2, '0') }}
-              </n-text>
-              <n-text class="result-unit">/公里</n-text>
-            </div>
+            <PaceResultDisplay
+              v-if="calculationMode === 'timeToPace'"
+              :minutes="resultPace.minutes"
+              :seconds="resultPace.seconds"
+            />
 
-            <div v-if="calculationMode === 'paceToTime'" class="result-item">
-              <n-text class="result-label">完賽時間</n-text>
-              <n-text class="result-value primary">{{ resultTimeFormatted }}</n-text>
-            </div>
-
-            <div class="distance-info">
-              <n-text class="distance-label">總距離</n-text>
-              <n-text class="distance-value">{{ selectedDistance }}公里</n-text>
-            </div>
+            <TimeResultDisplay
+              v-if="calculationMode === 'paceToTime'"
+              label="完賽時間"
+              :value="resultTimeFormatted"
+              unit=""
+              format="time"
+            />
           </n-space>
         </n-card>
 
@@ -142,6 +85,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, reactive } from 'vue'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
 import {
   NCard,
   NForm,
@@ -149,9 +94,6 @@ import {
   NSelect,
   NRadioGroup,
   NRadio,
-  NInputNumber,
-  NInputGroup,
-  NInputGroupLabel,
   NText,
   NIcon,
   NSpace,
@@ -161,6 +103,13 @@ import {
 } from 'naive-ui'
 import { Calculator as CalculatorIcon } from '@vicons/ionicons5'
 import { usePaceCalculator, type PaceTime } from '../../../composables/usePaceCalculator'
+import TimeInputGroup from '../../../components/input/TimeInputGroup.vue'
+import PaceInputGroup from '../../../components/input/PaceInputGroup.vue'
+import PaceResultDisplay from '../../../components/result-display/PaceResultDisplay.vue'
+import TimeResultDisplay from '../../../components/result-display/TimeResultDisplay.vue'
+
+// 啟用 duration 插件
+dayjs.extend(duration)
 
 const { calculatePaceFromTime, calculateTimeFromPace, formatTime } = usePaceCalculator()
 
@@ -176,9 +125,9 @@ const distanceOptions = [
 const selectedDistance = ref<number>(5)
 const calculationMode = ref<'timeToPace' | 'paceToTime'>('timeToPace')
 const targetHours = ref<number>(0)
-const targetMinutes = ref<number>(25)
+const targetMinutes = ref<number>(0)
 const targetSeconds = ref<number>(0)
-const paceMinutes = ref<number>(5)
+const paceMinutes = ref<number>(0)
 const paceSeconds = ref<number>(0)
 
 // 表單數據
@@ -203,18 +152,18 @@ const resultTime = ref<{ hours: number; minutes: number; seconds: number }>({
 // 顯示結果
 const showResult = computed(() => {
   if (calculationMode.value === 'timeToPace') {
-    return (
-      (targetHours.value > 0 || targetMinutes.value > 0 || targetSeconds.value > 0) &&
-      selectedDistance.value > 0
-    )
+    const hasValidTime = targetHours.value > 0 || targetMinutes.value > 0 || targetSeconds.value > 0
+    return hasValidTime && selectedDistance.value > 0
   } else {
-    return paceMinutes.value > 0 && selectedDistance.value > 0
+    const hasValidPace = paceMinutes.value > 0 || paceSeconds.value > 0
+    return hasValidPace && selectedDistance.value > 0
   }
 })
 
 // 格式化完賽時間
 const resultTimeFormatted = computed(() => {
   const { hours, minutes, seconds } = resultTime.value
+
   if (hours > 0) {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   } else {
@@ -224,7 +173,7 @@ const resultTimeFormatted = computed(() => {
 
 // 監聽完賽時間變化並計算配速
 watch(
-  [targetHours, targetMinutes, targetSeconds, selectedDistance],
+  [targetHours, targetMinutes, targetSeconds, selectedDistance, calculationMode],
   () => {
     if (calculationMode.value === 'timeToPace') {
       const totalSeconds = targetHours.value * 3600 + targetMinutes.value * 60 + targetSeconds.value
@@ -240,54 +189,33 @@ watch(
 
 // 監聽配速變化並計算完賽時間
 watch(
-  [paceMinutes, paceSeconds, selectedDistance],
+  [paceMinutes, paceSeconds, selectedDistance, calculationMode],
   () => {
-    if (
-      calculationMode.value === 'paceToTime' &&
-      paceMinutes.value > 0 &&
-      selectedDistance.value > 0
-    ) {
-      const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
-      const totalSeconds = calculateTimeFromPace(selectedDistance.value, pace)
-      resultTime.value = formatTime(totalSeconds)
-    } else {
-      resultTime.value = { hours: 0, minutes: 0, seconds: 0 }
+    if (calculationMode.value === 'paceToTime') {
+      const hasValidPace = paceMinutes.value > 0 || paceSeconds.value > 0
+      if (hasValidPace && selectedDistance.value > 0) {
+        const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
+        const totalSeconds = calculateTimeFromPace(selectedDistance.value, pace)
+        resultTime.value = formatTime(totalSeconds)
+      } else {
+        resultTime.value = { hours: 0, minutes: 0, seconds: 0 }
+      }
     }
   },
   { immediate: true },
 )
 
-// 切換計算模式時重置值並重新計算
+// 切換計算模式時重置值
 watch(calculationMode, (newMode) => {
   if (newMode === 'timeToPace') {
     targetHours.value = 0
-    targetMinutes.value = 25
+    targetMinutes.value = 0
     targetSeconds.value = 0
-    // 立即計算初始值
-    const totalSeconds = targetHours.value * 3600 + targetMinutes.value * 60 + targetSeconds.value
-    if (totalSeconds > 0 && selectedDistance.value > 0) {
-      resultPace.value = calculatePaceFromTime(selectedDistance.value, totalSeconds)
-    }
   } else {
-    paceMinutes.value = 5
+    paceMinutes.value = 0
     paceSeconds.value = 0
-    // 立即計算初始值
-    const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
-    const totalSeconds = calculateTimeFromPace(selectedDistance.value, pace)
-    resultTime.value = formatTime(totalSeconds)
   }
 })
-
-// 處理輸入框焦點事件，確保選取全部文字
-const handleFocus = (event: FocusEvent) => {
-  const target = event.target as HTMLInputElement
-  if (target) {
-    // 使用 setTimeout 確保在 focus 事件完成後執行選取
-    setTimeout(() => {
-      target.select()
-    }, 0)
-  }
-}
 </script>
 
 <style scoped>
@@ -372,121 +300,15 @@ const handleFocus = (event: FocusEvent) => {
   text-align: center;
 }
 
-/* 輸入欄位統一樣式 */
-.input-number-field {
-  flex: 1;
-  min-width: 50px;
-  max-width: none;
-}
-
-:deep(.input-label) {
-  min-width: 28px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #8892b0;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.2);
-  flex-shrink: 0;
-}
-
-:deep(.n-input-group) {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  gap: 1px;
-}
-
-:deep(.n-input-number) {
-  height: 40px;
-  flex: 1;
-  min-width: 0;
-}
-
-:deep(.n-input-number .n-input__input-el) {
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  padding: 0 4px;
-}
-
 @media (max-width: 768px) {
   .running-pace-calculator {
     padding: 16px;
-  }
-
-  .result-item {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 16px 0;
-  }
-
-  .result-label {
-    min-width: auto;
-    font-size: 14px;
-  }
-
-  .result-value {
-    font-size: 28px;
-    order: 2;
-  }
-
-  .result-unit {
-    font-size: 14px;
-    order: 3;
-  }
-
-  :deep(.input-label) {
-    min-width: 22px;
-    font-size: 10px;
-  }
-
-  .input-number-field {
-    min-width: 45px;
-    flex: 1;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 14px;
-    padding: 0 4px;
   }
 }
 
 @media (max-width: 480px) {
   .running-pace-calculator {
     padding: 12px;
-  }
-
-  .result-item {
-    padding: 12px 0;
-    gap: 6px;
-  }
-
-  .result-value {
-    font-size: 24px;
-  }
-
-  :deep(.input-label) {
-    min-width: 20px;
-    font-size: 9px;
-    padding: 0 2px;
-  }
-
-  .input-number-field {
-    min-width: 40px;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 12px;
-    padding: 0 2px;
-  }
-
-  :deep(.n-input-group) {
-    gap: 1px;
   }
 }
 </style>

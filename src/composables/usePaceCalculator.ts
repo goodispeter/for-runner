@@ -1,4 +1,9 @@
 import { ref, computed } from 'vue'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+
+// 啟用 duration 插件
+dayjs.extend(duration)
 
 export interface PaceTime {
   minutes: number
@@ -20,22 +25,33 @@ export function usePaceCalculator() {
 
   // 將時間字串 (HH:MM:SS 或 MM:SS) 轉換為秒數
   const timeStringToSeconds = (timeString: string): number => {
-    const parts = timeString.split(':').map(Number)
-    if (parts.length === 3) {
-      // HH:MM:SS
-      return parts[0] * 3600 + parts[1] * 60 + parts[2]
-    } else if (parts.length === 2) {
-      // MM:SS
-      return parts[0] * 60 + parts[1]
+    // 使用 dayjs 解析時間字串
+    let time: dayjs.Dayjs
+
+    if (timeString.includes(':')) {
+      const parts = timeString.split(':')
+      if (parts.length === 3) {
+        // HH:MM:SS 格式
+        time = dayjs(`1970-01-01 ${timeString}`)
+      } else if (parts.length === 2) {
+        // MM:SS 格式，假設為 00:MM:SS
+        time = dayjs(`1970-01-01 00:${timeString}`)
+      } else {
+        return 0
+      }
+    } else {
+      return 0
     }
-    return 0
+
+    return time.diff(dayjs('1970-01-01 00:00:00'), 'seconds')
   }
 
   // 將秒數轉換為時間字串
   const secondsToTimeString = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
-    const secs = Math.floor(seconds % 60)
+    const duration = dayjs.duration(seconds, 'seconds')
+    const hours = Math.floor(duration.asHours())
+    const minutes = duration.minutes()
+    const secs = duration.seconds()
 
     if (hours > 0) {
       return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
@@ -81,9 +97,10 @@ export function usePaceCalculator() {
   const formatTime = (
     totalSeconds: number,
   ): { hours: number; minutes: number; seconds: number } => {
-    const hours = Math.floor(totalSeconds / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-    const seconds = Math.floor(totalSeconds % 60)
+    const duration = dayjs.duration(totalSeconds, 'seconds')
+    const hours = Math.floor(duration.asHours())
+    const minutes = duration.minutes()
+    const seconds = duration.seconds()
     return { hours, minutes, seconds }
   }
 

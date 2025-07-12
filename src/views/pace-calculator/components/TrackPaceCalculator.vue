@@ -24,50 +24,20 @@
             </n-form-item>
 
             <n-form-item v-if="calculationMode === 'lapTimeToPace'" label="單圈時間">
-              <n-input-group>
-                <n-input-number
-                  v-model:value="lapTimeSeconds"
-                  :min="1"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">秒</n-input-group-label>
-              </n-input-group>
+              <SecondInput
+                :value="lapTimeSeconds"
+                :min="1"
+                @update:value="(val: number) => (lapTimeSeconds = val)"
+              />
             </n-form-item>
 
             <n-form-item v-if="calculationMode === 'paceToLapTime'" label="每公里配速">
-              <n-input-group>
-                <n-input-number
-                  v-model:value="paceMinutes"
-                  :min="1"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">分</n-input-group-label>
-                <n-input-number
-                  v-model:value="paceSeconds"
-                  :min="0"
-                  :max="59"
-                  size="large"
-                  class="input-number-field"
-                  :show-button="false"
-                  clearable
-                  select-on-focus
-                  placeholder=""
-                  @focus="handleFocus"
-                />
-                <n-input-group-label class="input-label">秒</n-input-group-label>
-              </n-input-group>
+              <PaceInputGroup
+                :minutes="paceMinutes"
+                :seconds="paceSeconds"
+                @update:minutes="(val: number) => (paceMinutes = val)"
+                @update:seconds="(val: number) => (paceSeconds = val)"
+              />
             </n-form-item>
           </n-form>
         </n-card>
@@ -81,24 +51,19 @@
           </template>
 
           <n-space vertical size="large">
-            <div v-if="calculationMode === 'lapTimeToPace'" class="result-item">
-              <n-text class="result-label">配速</n-text>
-              <n-text class="result-value primary">
-                {{ resultPace.minutes }}:{{ resultPace.seconds.toString().padStart(2, '0') }}
-              </n-text>
-              <n-text class="result-unit">/公里</n-text>
-            </div>
+            <PaceResultDisplay
+              v-if="calculationMode === 'lapTimeToPace'"
+              :minutes="resultPace.minutes"
+              :seconds="resultPace.seconds"
+            />
 
-            <div v-if="calculationMode === 'paceToLapTime'" class="result-item">
-              <n-text class="result-label">單圈時間</n-text>
-              <n-text class="result-value primary">{{ Math.round(resultLapTime) }}</n-text>
-              <n-text class="result-unit">秒</n-text>
-            </div>
-
-            <div class="track-info">
-              <n-text class="track-label">跑道距離</n-text>
-              <n-text class="track-value">{{ trackDistance }}公尺</n-text>
-            </div>
+            <TimeResultDisplay
+              v-if="calculationMode === 'paceToLapTime'"
+              label="單圈時間"
+              :value="resultLapTime"
+              unit="秒"
+              format="number"
+            />
           </n-space>
         </n-card>
 
@@ -124,9 +89,6 @@ import {
   NSelect,
   NRadioGroup,
   NRadio,
-  NInputNumber,
-  NInputGroup,
-  NInputGroupLabel,
   NText,
   NIcon,
   NSpace,
@@ -136,6 +98,10 @@ import {
 } from 'naive-ui'
 import { Calculator as CalculatorIcon } from '@vicons/ionicons5'
 import { usePaceCalculator, type PaceTime } from '../../../composables/usePaceCalculator'
+import SecondInput from '../../../components/input/SecondInput.vue'
+import PaceInputGroup from '../../../components/input/PaceInputGroup.vue'
+import PaceResultDisplay from '../../../components/result-display/PaceResultDisplay.vue'
+import TimeResultDisplay from '../../../components/result-display/TimeResultDisplay.vue'
 
 const { calculateTrackDistance, calculatePaceFromLapTime, calculateLapTimeFromPace } =
   usePaceCalculator()
@@ -153,8 +119,8 @@ const laneOptions = [
 // 響應式數據
 const selectedLane = ref<number>(1)
 const calculationMode = ref<'lapTimeToPace' | 'paceToLapTime'>('lapTimeToPace')
-const lapTimeSeconds = ref<number>(90)
-const paceMinutes = ref<number>(5)
+const lapTimeSeconds = ref<number>(0)
+const paceMinutes = ref<number>(0)
 const paceSeconds = ref<number>(0)
 
 // 表單數據
@@ -178,22 +144,21 @@ const showResult = computed(() => {
   if (calculationMode.value === 'lapTimeToPace') {
     return lapTimeSeconds.value > 0 && selectedLane.value > 0
   } else {
-    return paceMinutes.value > 0 && selectedLane.value > 0
+    const hasValidPace = paceMinutes.value > 0 || paceSeconds.value > 0
+    return hasValidPace && selectedLane.value > 0
   }
 })
 
 // 監聽單圈時間變化並計算配速
 watch(
-  [lapTimeSeconds, selectedLane],
+  [lapTimeSeconds, selectedLane, calculationMode],
   () => {
-    if (
-      calculationMode.value === 'lapTimeToPace' &&
-      lapTimeSeconds.value > 0 &&
-      selectedLane.value
-    ) {
-      resultPace.value = calculatePaceFromLapTime(selectedLane.value, lapTimeSeconds.value)
-    } else {
-      resultPace.value = { minutes: 0, seconds: 0 }
+    if (calculationMode.value === 'lapTimeToPace') {
+      if (lapTimeSeconds.value > 0 && selectedLane.value) {
+        resultPace.value = calculatePaceFromLapTime(selectedLane.value, lapTimeSeconds.value)
+      } else {
+        resultPace.value = { minutes: 0, seconds: 0 }
+      }
     }
   },
   { immediate: true },
@@ -201,45 +166,30 @@ watch(
 
 // 監聽配速變化並計算單圈時間
 watch(
-  [paceMinutes, paceSeconds, selectedLane],
+  [paceMinutes, paceSeconds, selectedLane, calculationMode],
   () => {
-    if (calculationMode.value === 'paceToLapTime' && paceMinutes.value > 0 && selectedLane.value) {
-      const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
-      resultLapTime.value = calculateLapTimeFromPace(selectedLane.value, pace)
-    } else {
-      resultLapTime.value = 0
+    if (calculationMode.value === 'paceToLapTime') {
+      const hasValidPace = paceMinutes.value > 0 || paceSeconds.value > 0
+      if (hasValidPace && selectedLane.value) {
+        const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
+        resultLapTime.value = calculateLapTimeFromPace(selectedLane.value, pace)
+      } else {
+        resultLapTime.value = 0
+      }
     }
   },
   { immediate: true },
 )
 
-// 切換計算模式時重置值並重新計算
+// 切換計算模式時重置值
 watch(calculationMode, (newMode) => {
   if (newMode === 'lapTimeToPace') {
-    lapTimeSeconds.value = 90
-    // 立即計算初始值
-    if (lapTimeSeconds.value > 0 && selectedLane.value) {
-      resultPace.value = calculatePaceFromLapTime(selectedLane.value, lapTimeSeconds.value)
-    }
+    lapTimeSeconds.value = 0
   } else {
-    paceMinutes.value = 5
+    paceMinutes.value = 0
     paceSeconds.value = 0
-    // 立即計算初始值
-    const pace: PaceTime = { minutes: paceMinutes.value, seconds: paceSeconds.value }
-    resultLapTime.value = calculateLapTimeFromPace(selectedLane.value, pace)
   }
 })
-
-// 處理輸入框焦點事件，確保選取全部文字
-const handleFocus = (event: FocusEvent) => {
-  const target = event.target as HTMLInputElement
-  if (target) {
-    // 使用 setTimeout 確保在 focus 事件完成後執行選取
-    setTimeout(() => {
-      target.select()
-    }, 0)
-  }
-}
 </script>
 
 <style scoped>
@@ -261,40 +211,6 @@ const handleFocus = (event: FocusEvent) => {
   font-size: 18px;
   font-weight: 600;
   color: #64ffda;
-}
-
-.result-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 20px 0;
-  justify-content: center;
-  flex-wrap: nowrap;
-}
-
-.result-label {
-  color: #8892b0;
-  font-size: 16px;
-  min-width: 80px;
-  flex-shrink: 0;
-}
-
-.result-value {
-  font-size: 32px;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.result-value.primary {
-  color: #64ffda;
-}
-
-.result-unit {
-  color: #8892b0;
-  font-size: 16px;
-  flex-shrink: 0;
 }
 
 .track-info {
@@ -324,121 +240,15 @@ const handleFocus = (event: FocusEvent) => {
   text-align: center;
 }
 
-/* 輸入欄位統一樣式 */
-.input-number-field {
-  flex: 1;
-  min-width: 50px;
-  max-width: none;
-}
-
-:deep(.input-label) {
-  min-width: 28px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #8892b0;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.2);
-  flex-shrink: 0;
-}
-
-:deep(.n-input-group) {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  gap: 1px;
-}
-
-:deep(.n-input-number) {
-  height: 40px;
-  flex: 1;
-  min-width: 0;
-}
-
-:deep(.n-input-number .n-input__input-el) {
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  padding: 0 4px;
-}
-
 @media (max-width: 768px) {
   .track-pace-calculator {
     padding: 16px;
-  }
-
-  .result-item {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-    padding: 16px 0;
-  }
-
-  .result-label {
-    min-width: auto;
-    font-size: 14px;
-  }
-
-  .result-value {
-    font-size: 28px;
-    order: 2;
-  }
-
-  .result-unit {
-    font-size: 14px;
-    order: 3;
-  }
-
-  :deep(.input-label) {
-    min-width: 22px;
-    font-size: 10px;
-  }
-
-  .input-number-field {
-    min-width: 45px;
-    flex: 1;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 14px;
-    padding: 0 4px;
   }
 }
 
 @media (max-width: 480px) {
   .track-pace-calculator {
     padding: 12px;
-  }
-
-  .result-item {
-    padding: 12px 0;
-    gap: 6px;
-  }
-
-  .result-value {
-    font-size: 24px;
-  }
-
-  :deep(.input-label) {
-    min-width: 20px;
-    font-size: 9px;
-    padding: 0 2px;
-  }
-
-  .input-number-field {
-    min-width: 40px;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 12px;
-    padding: 0 2px;
-  }
-
-  :deep(.n-input-group) {
-    gap: 1px;
   }
 }
 </style>
