@@ -1,41 +1,62 @@
 <template>
-  <n-input-group class="time-input-group">
-    <n-input-number
-      :model-value="hours"
-      :min="0"
-      size="large"
-      class="input-number-field"
-      :show-button="false"
-      placeholder="0"
-      @focus="handleFocus"
-      @update:value="(val) => handleValueUpdate(val, 'hours')"
-    />
-    <n-input-group-label class="input-label">時</n-input-group-label>
-    <n-input-number
-      :model-value="minutes"
-      :min="0"
-      :max="59"
-      size="large"
-      class="input-number-field"
-      :show-button="false"
-      placeholder="0"
-      @focus="handleFocus"
-      @update:value="(val) => handleValueUpdate(val, 'minutes')"
-    />
-    <n-input-group-label class="input-label">分</n-input-group-label>
-    <n-input-number
-      :model-value="seconds"
-      :min="0"
-      :max="59"
-      size="large"
-      class="input-number-field"
-      :show-button="false"
-      placeholder="0"
-      @focus="handleFocus"
-      @update:value="(val) => handleValueUpdate(val, 'seconds')"
-    />
-    <n-input-group-label class="input-label">秒</n-input-group-label>
-  </n-input-group>
+  <div class="w-full flex justify-center px-1 sm:px-4 lg:px-6 overflow-x-auto">
+    <n-input-group
+      class="flex flex-nowrap items-center gap-0.5 sm:gap-1.5 max-w-sm sm:max-w-lg lg:max-w-xl"
+    >
+      <!-- 小時 -->
+      <n-input-number
+        :model-value="hours"
+        :min="0"
+        size="large"
+        class="flex-1 min-w-16 sm:min-w-20 lg:min-w-24"
+        :show-button="false"
+        placeholder="0"
+        input-class="text-center"
+        @focus="handleFocus"
+        @update:value="(val) => handleValueUpdate(val, 'hours')"
+      />
+      <n-input-group-label
+        class="text-xs sm:text-sm lg:text-base px-1.5 sm:px-2 lg:px-3 min-w-6 flex items-center justify-center text-gray-600 font-medium"
+        >時</n-input-group-label
+      >
+
+      <!-- 分鐘 -->
+      <n-input-number
+        :model-value="minutes"
+        :min="0"
+        :max="59"
+        size="large"
+        class="flex-1 min-w-16 sm:min-w-20 lg:min-w-24"
+        :show-button="false"
+        placeholder="0"
+        input-class="text-center"
+        @focus="handleFocus"
+        @update:value="(val) => handleValueUpdate(val, 'minutes')"
+      />
+      <n-input-group-label
+        class="text-xs sm:text-sm lg:text-base px-1.5 sm:px-2 lg:px-3 min-w-6 flex items-center justify-center text-gray-600 font-medium"
+        >分</n-input-group-label
+      >
+
+      <!-- 秒數 -->
+      <n-input-number
+        :model-value="seconds"
+        :min="0"
+        :max="59"
+        size="large"
+        class="flex-1 min-w-16 sm:min-w-20 lg:min-w-24"
+        :show-button="false"
+        placeholder="0"
+        input-class="text-center"
+        @focus="handleFocus"
+        @update:value="(val) => handleValueUpdate(val, 'seconds')"
+      />
+      <n-input-group-label
+        class="text-xs sm:text-sm lg:text-base px-1.5 sm:px-2 lg:px-3 min-w-6 flex items-center justify-center text-gray-600 font-medium"
+        >秒</n-input-group-label
+      >
+    </n-input-group>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -95,100 +116,29 @@ const handleValueUpdate = (value: number | null, type: 'hours' | 'minutes' | 'se
 </script>
 
 <style scoped>
-/* 輸入欄位統一樣式 */
-.input-number-field {
-  flex: 1;
-  min-width: 50px;
-  max-width: none;
-}
-
-:deep(.input-label) {
-  min-width: 28px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #8892b0;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.2);
-  flex-shrink: 0;
-}
-
-:deep(.n-input-group) {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  gap: 1px;
-}
-
-:deep(.n-input-number) {
-  height: 40px;
-  flex: 1;
-  min-width: 0;
-}
-
+/* 用 Tailwind 大大簡化了 CSS！ */
 :deep(.n-input-number .n-input__input-el) {
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  padding: 0 4px;
+  font-weight: 500;
 }
 
-@media (max-width: 768px) {
-  :deep(.input-label) {
-    min-width: 26px;
-    font-size: 11px;
-    padding: 0 4px;
-  }
-
-  .input-number-field {
-    min-width: 60px;
-    flex: 1;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 14px;
-    padding: 0 6px;
-  }
-
-  :deep(.n-input-group) {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    min-width: 0;
-  }
+:deep(.n-input-group-label) {
+  background: transparent !important;
+  border: none !important;
+  color: #6b7280 !important;
+  font-weight: 500;
 }
 
+/* 手機模式下的空間優化 */
 @media (max-width: 480px) {
-  :deep(.input-label) {
-    min-width: 22px;
-    width: 22px;
-    font-size: 11px;
-    padding: 0 1px;
-    flex-shrink: 0;
-  }
-
-  .input-number-field {
-    min-width: 55px;
-    flex: 1;
-    max-width: calc((100% - 66px) / 3);
-  }
-
   :deep(.n-input-number .n-input__input-el) {
-    font-size: 13px;
-    padding: 0 3px;
-    color: #ccd6f6 !important;
-    background-color: transparent !important;
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
-  :deep(.n-input-group) {
-    gap: 0px;
-    flex-wrap: nowrap;
-    overflow: visible;
-    width: 100%;
-    max-width: 100%;
-    margin-left: -4px;
+  :deep(.n-input-group-label) {
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: 12px;
   }
 }
 </style>

@@ -308,7 +308,27 @@ watch(calculationMode, (newMode) => {
 
 @media (max-width: 480px) {
   .running-pace-calculator {
-    padding: 12px;
+    padding: 8px;
+  }
+
+  /* 針對手機模式減少 card 的內邊距 */
+  :deep(.n-card .n-card__content) {
+    padding: 16px !important;
+  }
+
+  /* 針對手機模式減少 form 的間距 */
+  :deep(.n-form .n-form-item) {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .running-pace-calculator {
+    padding: 4px;
+  }
+
+  :deep(.n-card .n-card__content) {
+    padding: 12px !important;
   }
 }
 </style>

@@ -1,18 +1,23 @@
 <template>
-  <n-input-group>
-    <n-input-number
-      :model-value="value"
-      :min="min"
-      :max="max"
-      size="large"
-      class="input-number-field"
-      :show-button="false"
-      placeholder="0"
-      @focus="handleFocus"
-      @update:value="handleValueUpdate"
-    />
-    <n-input-group-label class="input-label">秒</n-input-group-label>
-  </n-input-group>
+  <div class="w-full flex justify-center px-2 sm:px-4 lg:px-6">
+    <n-input-group class="flex items-center max-w-48 sm:max-w-56 lg:max-w-64 gap-0.5 sm:gap-1">
+      <n-input-number
+        :model-value="value"
+        :min="min"
+        :max="max"
+        size="large"
+        class="flex-1 min-w-20 sm:min-w-24 lg:min-w-28"
+        :show-button="false"
+        placeholder="0"
+        @focus="handleFocus"
+        @update:value="handleValueUpdate"
+      />
+      <n-input-group-label
+        class="text-xs sm:text-sm lg:text-base px-2 sm:px-3 lg:px-4 min-w-7 sm:min-w-8 lg:min-w-9 flex items-center justify-center text-gray-600 font-medium"
+        >秒</n-input-group-label
+      >
+    </n-input-group>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -67,100 +72,15 @@ const handleValueUpdate = (value: number | null) => {
 </script>
 
 <style scoped>
-/* 輸入欄位統一樣式 */
-.input-number-field {
-  flex: 1;
-  min-width: 50px;
-  max-width: none;
-}
-
-:deep(.input-label) {
-  min-width: 28px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  color: #8892b0;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.2);
-  flex-shrink: 0;
-}
-
-:deep(.n-input-group) {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  gap: 1px;
-}
-
-:deep(.n-input-number) {
-  height: 40px;
-  flex: 1;
-  min-width: 0;
-}
-
+/* 用 Tailwind 大大簡化了 CSS！ */
 :deep(.n-input-number .n-input__input-el) {
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  padding: 0 4px;
+  font-weight: 500;
 }
 
-@media (max-width: 768px) {
-  :deep(.input-label) {
-    min-width: 26px;
-    font-size: 11px;
-    padding: 0 4px;
-  }
-
-  .input-number-field {
-    min-width: 60px;
-    flex: 1;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 14px;
-    padding: 0 6px;
-  }
-
-  :deep(.n-input-group) {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    min-width: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  :deep(.input-label) {
-    min-width: 24px;
-    font-size: 10px;
-    padding: 0 3px;
-  }
-
-  .input-number-field {
-    min-width: 55px;
-    flex: 1;
-  }
-
-  :deep(.n-input-number .n-input__input-el) {
-    font-size: 13px;
-    padding: 0 4px;
-    color: #ccd6f6 !important;
-    background-color: transparent !important;
-  }
-
-  :deep(.n-input-group) {
-    gap: 1px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  :deep(.n-input-group::-webkit-scrollbar) {
-    display: none;
-  }
+:deep(.n-input-group-label) {
+  background: transparent !important;
+  border: none !important;
+  color: #6b7280 !important;
+  font-weight: 500;
 }
 </style>
