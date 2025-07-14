@@ -52,12 +52,6 @@ const calculatorType = ref<'running' | 'track'>('running')
 </script>
 
 <style scoped>
-.pace-calculator-view {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 .main-calculator-card {
   background: rgba(22, 33, 62, 0.8);
   backdrop-filter: blur(10px);
@@ -107,10 +101,6 @@ const calculatorType = ref<'running' | 'track'>('running')
 }
 
 @media (max-width: 768px) {
-  .pace-calculator-view {
-    padding: 0 16px;
-  }
-
   .main-calculator-card {
     padding: 20px;
   }

@@ -74,12 +74,6 @@ const goToPaceCalculator = () => {
 </script>
 
 <style scoped>
-.home-page-view {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
 .welcome-card {
   background: rgba(22, 33, 62, 0.8);
   backdrop-filter: blur(10px);
@@ -192,10 +186,6 @@ const goToPaceCalculator = () => {
 }
 
 @media (max-width: 768px) {
-  .home-page-view {
-    padding: 0 16px;
-  }
-
   .welcome-title {
     font-size: 28px;
   }

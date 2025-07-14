@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { darkTheme } from 'naive-ui'
-import { NConfigProvider, NGlobalStyle, NLayout, NLayoutContent } from 'naive-ui'
+import { NConfigProvider, NGlobalStyle } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
-import AppFooter from './components/AppFooter.vue'
 import MainNavbar from './components/MainNavbar.vue'
 
 // 自定義主題配色
@@ -41,15 +40,16 @@ const themeOverrides: GlobalThemeOverrides = {
 <template>
   <n-config-provider :theme="darkTheme" :theme-overrides="themeOverrides">
     <n-global-style />
-    <n-layout class="app-layout">
-      <n-layout-content class="main-content">
+    <div class="app-layout">
+      <div class="main-content">
         <!-- 主要導航 -->
         <MainNavbar />
-        <!-- 路由內容 -->
-        <router-view />
-      </n-layout-content>
-      <AppFooter />
-    </n-layout>
+        <!-- 路由內容容器 -->
+        <div class="route-container">
+          <router-view />
+        </div>
+      </div>
+    </div>
   </n-config-provider>
 </template>
 
@@ -83,9 +83,21 @@ body {
   min-height: 0;
 }
 
+/* 統一的路由容器樣式 */
+.route-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .main-content {
     padding: 12px 16px 12px 16px;
+  }
+  
+  .route-container {
+    padding: 0 16px;
   }
 }
 </style>
