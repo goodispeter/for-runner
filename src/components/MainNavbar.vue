@@ -28,10 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { NCard, NSpace, NButton, NIcon } from 'naive-ui'
-import { Timer, Calendar, TrendingUp, Settings } from '@vicons/ionicons5'
+import { NSpace, NButton, NIcon } from 'naive-ui'
+import { Timer } from '@vicons/ionicons5'
 
 const router = useRouter()
 const route = useRoute()
