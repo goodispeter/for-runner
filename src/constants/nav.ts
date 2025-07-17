@@ -1,4 +1,4 @@
-import { Timer } from "@vicons/ionicons5";
+import { Timer } from '@vicons/ionicons5'
 
 export const mainNavOptions = [
   {
@@ -6,5 +6,5 @@ export const mainNavOptions = [
     key: 'pace-calculator',
     icon: Timer,
     route: '/pace-calculator',
-  }
-];
+  },
+]

@@ -70,7 +70,8 @@ const themeOverrides: GlobalThemeOverrides = {
 </script>
 
 <style>
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -94,7 +95,6 @@ html, body {
 
 .main-content {
   flex: 1;
-  padding-top: 56px;
   overflow: auto;
 }
 
@@ -102,7 +102,7 @@ html, body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 clamp(12px, 4vw, 20px);
+  padding-top: 12px;
   box-sizing: border-box;
 }
 
