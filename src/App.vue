@@ -70,10 +70,10 @@ const themeOverrides: GlobalThemeOverrides = {
 </script>
 
 <style>
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+  height: 100%;
   font-family:
     'Inter',
     -apple-system,
@@ -81,39 +81,34 @@ body {
     'Segoe UI',
     Roboto,
     sans-serif;
-  height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
 }
 
 .app-layout {
   height: 100vh;
-  background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
   display: flex;
   flex-direction: column;
 }
 
 .main-content {
   flex: 1;
-  padding: 16px 24px 16px 24px;
+  padding-top: 56px;
   overflow: auto;
-  min-height: 0;
 }
 
-/* 統一的路由容器樣式 */
 .route-container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
-  width: 100%;
+  padding: 0 clamp(12px, 4vw, 20px);
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 12px 16px 12px 16px;
-    padding-top: 80px; /* 頂部預留空間給 SmNavbar */
-  }
-  .route-container {
-    padding: 0 16px;
+    padding-top: 80px;
   }
 }
 </style>

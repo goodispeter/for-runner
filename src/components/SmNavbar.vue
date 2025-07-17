@@ -105,7 +105,7 @@ function handleTitleClick() {
   box-shadow: 0 8px 24px rgba(100, 255, 218, 0.12);
   padding: 8px 12px;
   width: fit-content;
-  max-width: 80vw;
+  max-width: calc(100vw - 40px);
   z-index: 2100;
 }
 
