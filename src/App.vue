@@ -1,8 +1,40 @@
+<template>
+  <n-config-provider :theme="darkTheme" :theme-overrides="themeOverrides">
+    <n-global-style />
+    <div class="app-layout">
+      <div class="main-content">
+        <!-- 主要導航：依螢幕寬度切換 -->
+        <MainNavbar v-if="!isMobile" />
+        <SmNavbar v-else />
+        <!-- 路由內容容器 -->
+        <div class="route-container">
+          <router-view />
+        </div>
+      </div>
+    </div>
+  </n-config-provider>
+</template>
+
 <script setup lang="ts">
 import { darkTheme } from 'naive-ui'
 import { NConfigProvider, NGlobalStyle } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
 import MainNavbar from './components/MainNavbar.vue'
+import SmNavbar from './components/SmNavbar.vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+
+// 響應式判斷是否為小螢幕
+const isMobile = ref(false)
+function handleResize() {
+  isMobile.value = window.innerWidth <= 768
+}
+onMounted(() => {
+  handleResize()
+  window.addEventListener('resize', handleResize)
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 
 // 自定義主題配色
 const themeOverrides: GlobalThemeOverrides = {
@@ -36,22 +68,6 @@ const themeOverrides: GlobalThemeOverrides = {
   },
 }
 </script>
-
-<template>
-  <n-config-provider :theme="darkTheme" :theme-overrides="themeOverrides">
-    <n-global-style />
-    <div class="app-layout">
-      <div class="main-content">
-        <!-- 主要導航 -->
-        <MainNavbar />
-        <!-- 路由內容容器 -->
-        <div class="route-container">
-          <router-view />
-        </div>
-      </div>
-    </div>
-  </n-config-provider>
-</template>
 
 <style>
 body {
@@ -94,8 +110,8 @@ body {
 @media (max-width: 768px) {
   .main-content {
     padding: 12px 16px 12px 16px;
+    padding-top: 80px; /* 頂部預留空間給 SmNavbar */
   }
-  
   .route-container {
     padding: 0 16px;
   }

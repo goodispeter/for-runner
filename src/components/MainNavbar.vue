@@ -30,39 +30,10 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
 import { NSpace, NButton, NIcon } from 'naive-ui'
-import { Timer } from '@vicons/ionicons5'
+import { mainNavOptions } from '@/constants/nav'
 
 const router = useRouter()
 const route = useRoute()
-
-// 主要導航選項
-const mainNavOptions = [
-  {
-    label: '配速計算',
-    key: 'pace-calculator',
-    icon: Timer,
-    route: '/pace-calculator',
-  },
-  // 未來功能擴充預留
-  // {
-  //   label: '訓練計劃',
-  //   key: 'training-plan',
-  //   icon: TrendingUp,
-  //   route: '/for-runner/training-plan'
-  // },
-  // {
-  //   label: '比賽行事曆',
-  //   key: 'race-calendar',
-  //   icon: Calendar,
-  //   route: '/for-runner/race-calendar'
-  // },
-  // {
-  //   label: '設定',
-  //   key: 'settings',
-  //   icon: Settings,
-  //   route: '/for-runner/settings'
-  // }
-]
 
 // 判斷當前是否在該功能區塊
 const isCurrentSection = (key: string) => {
