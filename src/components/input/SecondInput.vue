@@ -7,6 +7,7 @@
         :max="max"
         size="large"
         class="flex-1 min-w-20 sm:min-w-24 lg:min-w-28"
+        :input-props="{ inputmode: 'numeric', pattern: '[0-9]*' }"
         :show-button="false"
         placeholder="0"
         @focus="handleFocus"
