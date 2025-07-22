@@ -45,18 +45,16 @@
 
       <!-- 結果區域 -->
       <n-grid-item>
-        <n-card v-if="showResult" embedded class="result-card">
+        <n-card  embedded class="result-card">
           <template #header>
             <n-text class="result-title">計算結果</n-text>
           </template>
-
-          <n-space vertical size="large">
+          <n-space vertical size="small">
             <PaceResultDisplay
               v-if="calculationMode === 'lapTimeToPace'"
               :minutes="resultPace.minutes"
               :seconds="resultPace.seconds"
             />
-
             <TimeResultDisplay
               v-if="calculationMode === 'paceToLapTime'"
               label="單圈時間"
@@ -66,15 +64,6 @@
             />
           </n-space>
         </n-card>
-
-        <!-- 空狀態 -->
-        <n-empty v-else description="請填寫完整資訊以計算結果" class="empty-state">
-          <template #icon>
-            <n-icon size="48" color="#64ffda">
-              <CalculatorIcon />
-            </n-icon>
-          </template>
-        </n-empty>
       </n-grid-item>
     </n-grid>
   </div>
@@ -90,13 +79,10 @@ import {
   NRadioGroup,
   NRadio,
   NText,
-  NIcon,
   NSpace,
-  NEmpty,
   NGrid,
   NGridItem,
 } from 'naive-ui'
-import { Calculator as CalculatorIcon } from '@vicons/ionicons5'
 import { usePaceCalculator, type PaceTime } from '../../../composables/usePaceCalculator'
 import SecondInput from '../../../components/input/SecondInput.vue'
 import PaceInputGroup from '../../../components/input/PaceInputGroup.vue'
@@ -235,11 +221,6 @@ watch(calculationMode, (newMode) => {
   font-weight: 600;
 }
 
-.empty-state {
-  padding: 60px 20px;
-  text-align: center;
-}
-
 @media (max-width: 768px) {
   .track-pace-calculator {
     padding: 16px;
@@ -250,13 +231,12 @@ watch(calculationMode, (newMode) => {
   .track-pace-calculator {
     padding: 8px;
   }
-
-  /* 針對手機模式減少 card 的內邊距 */
-  :deep(.n-card .n-card__content) {
-    padding: 16px !important;
+  .result-card {
+    padding: 0 !important;
   }
-
-  /* 針對手機模式減少 form 的間距 */
+  :deep(.n-card .n-card__content) {
+    padding: 8px !important;
+  }
   :deep(.n-form .n-form-item) {
     margin-bottom: 16px;
   }

@@ -4,7 +4,6 @@
     <n-text class="result-value primary">
       {{ minutes }}:{{ seconds.toString().padStart(2, '0') }}
     </n-text>
-    <n-text class="result-unit">/公里</n-text>
   </div>
 </template>
 
